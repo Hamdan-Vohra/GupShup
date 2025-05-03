@@ -12,19 +12,47 @@ except errors.ServerSelectionTimeoutError as err:
 
 db = client["chat_app"]
 
-def register_user(username,phonenumber,password):
-    print("Hello Registeirng User")
-    if db.users.find_one({"username": username}):
-        return False
-    hashed_pw = generate_password_hash(password)
-    db.users.insert_one({"username": username, "password": hashed_pw, "phone":phonenumber ,"friends": []})
-    return True
+def register_user(username, phonenumber, password):
+    try:
+        # Verification If User Already Exits
+        if db.users.find_one({"username": username}):
+            return {"success": False, "message": "Username already exists"}
+
+        if db.users.find_one({"phone": phonenumber}):
+            return {"success": False, "message": "Phone number already registered"}
+
+
+        hashed_pw = generate_password_hash(password)
+        db.users.insert_one({
+            "username": username,
+            "password": hashed_pw,
+            "phone": phonenumber,
+            "friends": [] 
+        })
+
+        return {"success": True, "message": "User registered successfully"}
+
+    except errors.PyMongoError as e:
+        print("Database error during registration:", e)
+        return {"success": False, "message": "An error occurred while registering the user"}
+
 
 def authenticate_user(username, password):
-    user = db.users.find_one({"username": username}) | db.users.find_one({"phone": username})
-    if user and check_password_hash(user['password'], password):
-        return True
-    return False
+    password = password.strip()
+    username = username.strip()
+    user = db.users.find_one({
+    "$or": [
+        {"username": username},
+        {"phone": username}
+    ]
+    })
+    if not user:
+        return {"success": False, "message": "User not found","session":None}
+    
+    if check_password_hash(user["password"], password):
+        return {"success":True,"message":f"{user["username"]} LoggedIn Successfully","session":"Session"}
+    
+    return {"success":False,"message":"Password is Incorrect!","session":None}
 
 def add_friend(user1, user2):
     if user1 == user2 or not db.users.find_one({"username": user2}):

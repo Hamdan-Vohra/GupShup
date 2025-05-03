@@ -5,7 +5,7 @@
   <h1 class="text-white text-3xl font-bold mb-4">Login Form</h1>
 
   <form
-    action="{{ url_for('register') }}"
+    action="{{ url_for('login') }}"
     method="POST"
     class="bg-white/20 backdrop-blur-md p-6 rounded-xl border border-white/30 w-full max-w-xl text-black"
   >
@@ -31,27 +31,33 @@
       />
     </div>
 
-    <!-- Submit -->
-    <button
-      type="submit"
-      class="bg-indigo-700 text-white font-semibold py-3 px-6 rounded-md hover:bg-indigo-800"
-    >
-      Register
-    </button>
+    <div class="flex justify-center items-center">
+      <button
+        type="submit"
+        class="bg-indigo-700 text-white font-semibold py-3 px-6 rounded-md hover:bg-indigo-800"
+      >
+        LogIn
+      </button>
+    </div>
 
-    <!-- Display Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %} {% if
     messages %}
-    <div class="mt-4 items-center">
+    <div class="flash-message mt-4 items-center w-full flex justify-center">
       {% for category, message in messages %}
       <p
-        class="text-sm text-{{ 'green-600' if category == 'success' else 'red-600' }}"
+        class="text-md text-{{ 'green-600' if category == 'success' else 'red-600' }} font-semibold"
       >
         {{ message }}
       </p>
       {% endfor %}
     </div>
     {% endif %} {% endwith %}
+    <script>
+      setTimeout(() => {
+        const flash = document.getElementById("flash-message");
+        if (flash) flash.style.display = "none";
+      }, 2000);
+    </script>
   </form>
 </div>
 {% endblock %}

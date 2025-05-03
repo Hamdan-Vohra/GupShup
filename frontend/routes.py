@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template,session,flash,redirect,url_for
+
 
 frontend_routes = Blueprint('frontend_routes', __name__)
 
@@ -16,9 +17,16 @@ def contact():
     return render_template('contact.html')
 
 @frontend_routes.route('/login', methods=['GET'])
-def login_page():
+def login():
     return render_template('login.html')
 
 @frontend_routes.route('/register', methods=['GET'])
 def register():
     return render_template('register.html')
+
+@frontend_routes.route('/chat-app', methods=['GET'])
+def ChatApp():
+    if 'username' not in session:
+        flash("Login required", "warning")
+        return redirect(url_for('login'))
+    return render_template("chat-app.html", username=session['username'])

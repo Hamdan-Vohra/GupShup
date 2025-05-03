@@ -3,18 +3,29 @@ let socket = io("http://localhost:5000", {
 });
 let currentUser = "";
 
-function register() {
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
+function register(event) {
+  event.preventDefault();
 
+  const username = document.getElementById("username").value;
+  const phone = document.getElementById("phone_number").value;
+  const password = document.getElementById("password").value;
+  const confirm_password = document.getElementById("password-confirm").value;
+
+  print(JSON.stringify({ username, phone, password, confirm_password }));
   fetch("/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ username, phone, password, confirm_password }),
   })
     .then((res) => res.json())
     .then((data) => {
-      alert(data.success ? "Registered!" : "Username taken.");
+      alert(
+        data.success ? "Registered!" : data.message || "Registration failed."
+      );
+    })
+    .catch((err) => {
+      console.error("Error:", err);
+      alert("Something went wrong.");
     });
 }
 
@@ -31,8 +42,8 @@ function login() {
     .then((data) => {
       if (data.success) {
         currentUser = username;
-        document.getElementById("currentUser").innerText = username;
-        document.getElementById("chat-ui").style.display = "block";
+        // document.getElementById("currentUser").innerText = username;
+        // document.getElementById("chat-ui").style.display = "block";
         socket.emit("connect_user", { username });
       } else {
         alert("Invalid credentials");

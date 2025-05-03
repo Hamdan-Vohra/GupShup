@@ -5,14 +5,27 @@
   <h1 class="text-white text-3xl font-bold mb-4">Registration Form</h1>
 
   <form
-    action="{{ url_for('register') }}"
+    action="{{url_for('register')}}"
     method="POST"
     class="bg-white/20 backdrop-blur-md p-6 rounded-xl border border-white/30 w-full max-w-xl text-black"
   >
-    <!-- Username -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="flash-message mt-4 items-center w-full flex justify-center">
+      {% for category, message in messages %}
+      <p
+        class="text-md text-{{ 'green-600' if category == 'success' else 'red-600' }} font-semibold"
+      >
+        {{ message }}
+      </p>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+
     <div class="mb-4">
       <label class="text-white font-semibold">Username</label>
       <input
+        id="username"
         type="text"
         name="username"
         class="w-full p-3 rounded-md border text-black text-lg"
@@ -20,10 +33,10 @@
       />
     </div>
 
-    <!-- Phone Number -->
     <div class="mb-4">
       <label class="text-white font-semibold">Phone Number</label>
       <input
+        id="phone_number"
         type="text"
         name="phone_number"
         class="w-full p-3 rounded-md border text-black text-lg"
@@ -31,10 +44,10 @@
       />
     </div>
 
-    <!-- Password -->
     <div class="mb-4">
       <label class="text-white font-semibold">Password</label>
       <input
+        id="password"
         type="password"
         name="password"
         class="w-full p-3 rounded-md border text-black text-lg"
@@ -42,10 +55,10 @@
       />
     </div>
 
-    <!-- Confirm Password -->
     <div class="mb-4">
       <label class="text-white font-semibold">Confirm Password</label>
       <input
+        id="password-confirm"
         type="password"
         name="password-confirm"
         class="w-full p-3 rounded-md border text-black text-lg"
@@ -53,27 +66,27 @@
       />
     </div>
 
-    <!-- Submit -->
-    <button
-      type="submit"
-      class="bg-indigo-700 text-white font-semibold py-3 px-6 rounded-md hover:bg-indigo-800"
-    >
-      Register
-    </button>
-
-    <!-- Display Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %} {% if
-    messages %}
-    <div class="mt-4 items-center">
-      {% for category, message in messages %}
-      <p
-        class="text-sm text-{{ 'green-600' if category == 'success' else 'red-600' }}"
+    <div class="flex justify-center items-center">
+      <button
+        type="submit"
+        class="bg-indigo-700 text-white font-semibold py-3 px-6 rounded-md hover:bg-indigo-800"
       >
-        {{ message }}
-      </p>
-      {% endfor %}
+        Register
+      </button>
     </div>
-    {% endif %} {% endwith %}
+
+    <div class="flex justify-center items-center">
+      <p>Already Registered?</p>
+
+      <a href="{{url_for('login')}}" class="text-white/400 underline">Login</a>
+    </div>
   </form>
+
+  <script>
+    setTimeout(() => {
+      const flash = document.getElementById("flash-message");
+      if (flash) flash.style.display = "none";
+    }, 2000);
+  </script>
 </div>
 {% endblock %}
