@@ -1,0 +1,79 @@
+{% extends 'index.html' %} {% block content %}
+<div
+  class="flex flex-col h-screen bg-gradient-to-r from-purple-600 to-indigo-600 items-center justify-center"
+>
+  <h1 class="text-white text-3xl font-bold mb-4">Registration Form</h1>
+
+  <form
+    action="{{ url_for('register') }}"
+    method="POST"
+    class="bg-white/20 backdrop-blur-md p-6 rounded-xl border border-white/30 w-full max-w-xl text-black"
+  >
+    <!-- Username -->
+    <div class="mb-4">
+      <label class="text-white font-semibold">Username</label>
+      <input
+        type="text"
+        name="username"
+        class="w-full p-3 rounded-md border text-black text-lg"
+        required
+      />
+    </div>
+
+    <!-- Phone Number -->
+    <div class="mb-4">
+      <label class="text-white font-semibold">Phone Number</label>
+      <input
+        type="text"
+        name="phone_number"
+        class="w-full p-3 rounded-md border text-black text-lg"
+        required
+      />
+    </div>
+
+    <!-- Password -->
+    <div class="mb-4">
+      <label class="text-white font-semibold">Password</label>
+      <input
+        type="password"
+        name="password"
+        class="w-full p-3 rounded-md border text-black text-lg"
+        required
+      />
+    </div>
+
+    <!-- Confirm Password -->
+    <div class="mb-4">
+      <label class="text-white font-semibold">Confirm Password</label>
+      <input
+        type="password"
+        name="password-confirm"
+        class="w-full p-3 rounded-md border text-black text-lg"
+        required
+      />
+    </div>
+
+    <!-- Submit -->
+    <button
+      type="submit"
+      class="bg-indigo-700 text-white font-semibold py-3 px-6 rounded-md hover:bg-indigo-800"
+    >
+      Register
+    </button>
+
+    <!-- Display Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="mt-4 items-center">
+      {% for category, message in messages %}
+      <p
+        class="text-sm text-{{ 'green-600' if category == 'success' else 'red-600' }}"
+      >
+        {{ message }}
+      </p>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+  </form>
+</div>
+{% endblock %}
