@@ -32,8 +32,9 @@ def register():
     elif password != confirm_password:
         flash('Passwords do not match.', 'danger')
     else:
-        flash(f'Registration successful for {username}!', 'success')
-        return redirect(url_for('login'))
+        if register_user(username=username,password=password,phonenumber=phone_number):
+            flash(f'Registration successful for {username}!', 'success')
+            return redirect(url_for('login'))
 
 
 @app.route("/login", methods=["POST"])

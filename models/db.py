@@ -1,11 +1,19 @@
-from pymongo import MongoClient
+from pymongo import MongoClient, errors
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import MONGO_URI
 
-client = MongoClient(MONGO_URI)
+try:
+    client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+    client.server_info()
+    print("Successfully connected to MongoDB Atlas!")
+except errors.ServerSelectionTimeoutError as err:
+    print("Could not connect to MongoDB:", err)
+    exit(1) 
+
 db = client["chat_app"]
 
 def register_user(username,phonenumber,password):
+    print("Hello Registeirng User")
     if db.users.find_one({"username": username}):
         return False
     hashed_pw = generate_password_hash(password)
