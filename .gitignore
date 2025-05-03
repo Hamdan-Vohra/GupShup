@@ -1,0 +1,35 @@
+# Bytecode
+__pycache__/
+*.py[cod]
+
+# Environment
+venv/
+.env
+.env.*
+
+# Flask specific
+instance/
+*.db
+*.sqlite3
+*.pyc
+*.pyo
+
+# Log files
+*.log
+
+# VSCode and IDEs
+.vscode/
+.idea/
+
+# Node.js if used for frontend
+node_modules/
+*.tsbuildinfo
+
+# Build/distribution
+build/
+dist/
+*.egg-info/
+
+# OS / Misc
+.DS_Store
+Thumbs.db

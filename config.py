@@ -1,3 +1,7 @@
-MONGO_URI = "mongodb+srv://me:hamdanvohra@vohra.fxrc6nq.mongodb.net/?retryWrites=true&w=majority&appName=vohra"
-SECRET_KEY = "@#{{...@#{{...@#{{"
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+MONGO_URI = os.getenv("MONGO_URI")
