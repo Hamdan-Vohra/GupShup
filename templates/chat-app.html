@@ -17,20 +17,23 @@
         class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between rounded-b-2xl backdrop-blur-md bg-white/10 border border-white/30"
       >
         <h1 class="text-2xl font-bold">GuPShuP</h1>
-        <nav
-          class="flex-1 flex justify-center space-x-8 text-lg font-medium glassy"
-        >
-          <a
-            href="{{ url_for('frontend_routes.home') }}"
-            class="hover:underline"
-            >Profile</a
+        <div class="welcome-message flex justify-center items-center">
+          <h2>Welcome, {{ username }}</h2>
+          <nav
+            class="flex-1 flex justify-center space-x-8 text-lg font-medium glassy"
           >
-          <a
-            href="{{ url_for('frontend_routes.about') }}"
-            class="hover:underline"
-            >Settings</a
-          >
-        </nav>
+            <a
+              href="{{ url_for('frontend_routes.home') }}"
+              class="hover:underline"
+              >Profile</a
+            >
+            <a
+              href="{{ url_for('frontend_routes.about') }}"
+              class="hover:underline"
+              >Settings</a
+            >
+          </nav>
+        </div>
       </div>
     </header>
 
@@ -74,5 +77,14 @@
     <footer class="bg-gray-800 text-white text-center py-4">
       <p>&copy; 2025 GuPShuP | All rights reserved</p>
     </footer>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+
+    <script>
+      // Provide currentUser to chat.js
+      const currentUser = "{{ username }}";
+      socket.emit("connect_user", { username: currentUser });
+    </script>
   </body>
 </html>
