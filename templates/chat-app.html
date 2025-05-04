@@ -2,89 +2,134 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>GupShup</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>GupShup Chat</title>
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+    <script>
+      const currentUser = "{{ username }}";
+    </script>
+    <script src="{{ url_for('static', filename='js/chat.js') }}" defer></script>
     <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
       rel="stylesheet"
-      href="{{ url_for('static', filename='css/styles.css') }}"
     />
   </head>
-  <body class="bg-gray-100 flex flex-col min-h-screen">
-    <header
-      class="bg-gradient-to-r from-purple-600 to-indigo-600 shadow-md text-white"
+  <body
+    class="bg-gradient-to-br from-indigo-300 to-purple-300 min-h-screen flex flex-col items-center justify-center p-6"
+  >
+    <p class="mb-4 text-lg text-white font-semibold">
+      You are logged in as: <span class="text-yellow-200">{{ username }}</span>
+    </p>
+    <div
+      class="w-full max-w-8xl h-[80vh] bg-white/20 backdrop-blur rounded-xl shadow-lg flex overflow-hidden"
     >
-      <div
-        class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between rounded-b-2xl backdrop-blur-md bg-white/10 border border-white/30"
-      >
-        <h1 class="text-2xl font-bold">GuPShuP</h1>
-        <div class="welcome-message flex justify-center items-center">
-          <h2>Welcome, {{ username }}</h2>
-          <nav
-            class="flex-1 flex justify-center space-x-8 text-lg font-medium glassy"
+      <!-- Friend List -->
+      <aside class="w-1/4 bg-white/30 p-4 overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold text-black">Friends</h2>
+          <button
+            onclick="toggleAddFriendForm()"
+            class="text-xl bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-indigo-700"
           >
-            <a
-              href="{{ url_for('frontend_routes.home') }}"
-              class="hover:underline"
-              >Profile</a
-            >
-            <a
-              href="{{ url_for('frontend_routes.about') }}"
-              class="hover:underline"
-              >Settings</a
-            >
-          </nav>
+            +
+          </button>
         </div>
-      </div>
-    </header>
+        <!-- This will be replaced by hamza's code -->
+        <ul id="friend-list" class="space-y-2 text-black">
+          {% if friends %} {% for phone in friends %}
+          <li>
+            <button
+              onclick="selectFriend('{{ phone.username }}')"
+              class="w-full text-left px-3 py-2 bg-white rounded shadow hover:bg-indigo-100"
+            >
+              {{ phone['username'] }}
+            </button>
+          </li>
+          {% endfor %} {% else %}
+          <li class="text-gray-500 text-sm px-3 py-2">No Friends yet!</li>
+          {% endif %}
+        </ul>
+      </aside>
 
-    <main class="flex-grow h-auto overflow-y-auto">
-      <form
-        action="{{ url_for('add_friend') }}"
-        method="POST"
-        class="bg-white/20 backdrop-blur-md p-6 rounded-xl border border-white/30 w-full max-w-xl text-black"
-      >
-        <div class="mb-4">
-          <label class="">Friend's Number</label>
+      <!-- Chat Area -->
+      <section class="flex-1 flex flex-col p-6">
+        <h2 class="text-2xl font-bold text-black mb-4">
+          Chat with:
+          <span id="chat-with" class="font-mono text-indigo-700">None</span>
+        </h2>
+        <div
+          id="chat-box"
+          class="flex-grow bg-white rounded-lg p-4 overflow-y-auto shadow-inner mb-4"
+        ></div>
+        <div class="flex gap-2">
+          <input
+            id="chat-input"
+            type="text"
+            placeholder="Type a message..."
+            class="flex-1 p-3 border rounded-lg text-black"
+          />
+          <button
+            onclick="sendMessage()"
+            class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
+          >
+            Send
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Add Friend Modal -->
+    <div
+      id="add-friend-form"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50"
+    >
+      <div class="bg-white p-6 rounded-lg w-full max-w-md text-black">
+        <h2 class="text-xl font-bold mb-4">Add a Friend</h2>
+        <form method="POST" action="/add_friend">
           <input
             type="text"
-            name="friends-number"
-            class="w-full p-3 rounded-md border text-black text-lg"
+            name="friend_phone"
+            placeholder="Enter friend's phone number"
             required
+            class="w-full p-3 border rounded mb-4 text-black"
           />
-        </div>
-
-        <button
-          type="submit"
-          class="bg-indigo-700 text-white font-semibold py-3 px-6 rounded-md hover:bg-indigo-800"
-        >
-          Add Friend
-        </button>
-        {% with messages = get_flashed_messages(with_categories=true) %} {% if
-        messages %}
-        <div class="mt-4 items-center w-full flex justify-center text-bold">
-          {% for category, message in messages %}
-          <p
-            class="text-md text-{{ 'green-600' if category == 'success' else 'red-600' }} font-semibold"
+          <div class="flex justify-end gap-2">
+            <button
+              type="button"
+              onclick="toggleAddFriendForm()"
+              class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+            >
+              Add to Friends
+            </button>
+          </div>
+          {% with messages = get_flashed_messages(with_categories=true) %} {% if
+          messages %}
+          <div
+            class="flash-message mt-4 items-center w-full flex justify-center"
           >
-            {{ message }}
-          </p>
-          {% endfor %}
-        </div>
-        {% endif %} {% endwith %}
-      </form>
-    </main>
-
-    <footer class="bg-gray-800 text-white text-center py-4">
-      <p>&copy; 2025 GuPShuP | All rights reserved</p>
-    </footer>
-
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+            {% for category, message in messages %}
+            <p
+              class="text-md text-{{ 'green-600' if category == 'success' else 'red-600' }} font-semibold"
+            >
+              {{ message }}
+            </p>
+            {% endfor %}
+          </div>
+          {% endif %} {% endwith %}
+        </form>
+      </div>
+    </div>
 
     <script>
-      // Provide currentUser to chat.js
-      const currentUser = "{{ username }}";
-      socket.emit("connect_user", { username: currentUser });
+      function toggleAddFriendForm() {
+        const form = document.getElementById("add-friend-form");
+        form.classList.toggle("hidden");
+      }
     </script>
   </body>
 </html>
