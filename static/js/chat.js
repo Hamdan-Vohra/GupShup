@@ -10,9 +10,36 @@ socket.on("connect", () => {
 socket.on("receive_message", (data) => {
   if (data.sender === selectedFriend) {
     appendMessage(data.sender, data.message, data.timestamp);
+  } else {
   }
 });
 
+socket.on("friend_added", (data) => {
+  const friendList = document.getElementById("friend-list");
+  const newFriend = data.username;
+
+  const exists = [...friendList.children].some(
+    (li) => li.innerText.trim() === newFriend
+  );
+
+  if (!exists) {
+    const li = document.createElement("li");
+    li.innerHTML = `<button onclick="selectFriend('${newFriend}')" class="w-full text-left px-3 py-2 bg-white rounded shadow hover:bg-indigo-100">${newFriend}</button>`;
+    friendList.appendChild(li);
+
+    if (window.friendListData) {
+      window.friendListData.push({ username: newFriend });
+    }
+  }
+});
+
+socket.on("error", (data) => {
+  console.error("SocketIO error received:", data.message);
+  alert(`Error: ${data.message}`);
+});
+// Socket Functionalities Ended
+
+// Simple Javascript functions
 function selectFriend(friendUsername) {
   selectedFriend = friendUsername;
   document.getElementById("chat-with").textContent = friendUsername;
@@ -27,14 +54,30 @@ function selectFriend(friendUsername) {
     .catch((err) => console.error("Error fetching messages:", err));
 }
 
-socket.on("error", (data) => {
-  console.error("SocketIO error received:", data.message);
-  alert(`Error: ${data.message}`);
-});
+function loadFriendList() {
+  const friendList = document.getElementById("friend-list");
+  friendList.innerHTML = "";
+  console.log("Friends:", window.friendListData);
 
-// Socket Functionalities Ended
+  if (
+    Array.isArray(window.friendListData) &&
+    window.friendListData.length > 0
+  ) {
+    window.friendListData.forEach((friend) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<button onclick="selectFriend('${friend.username}')" class="w-full text-left px-3 py-2 bg-white rounded shadow hover:bg-indigo-100">${friend.username}</button>`;
+      friendList.appendChild(li);
+    });
+  } else {
+    const li = document.createElement("li");
+    li.className = "text-gray-500 text-sm px-3 py-2";
+    li.textContent = "No Friends yet!";
+    friendList.appendChild(li);
+  }
+}
 
-// Simple Javascript functions
+document.addEventListener("DOMContentLoaded", loadFriendList);
+
 function appendMessage(sender, message, timestamp = null) {
   const chatBox = document.getElementById("chat-box");
   const msgDiv = document.createElement("div");

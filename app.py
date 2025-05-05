@@ -77,10 +77,10 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
+
 @app.route('/chat')
 def chat():
     username = session['username']
-    print("/chat",username)
     if 'username' not in session:
         return redirect(url_for('login'))
     res = friends_list(username)
@@ -95,7 +95,6 @@ def add_friend():
         return jsonify({"success": False, "message": "Not logged in"})
     user = session['username']
     friends_number = request.form.get("friend_phone")
-    print(friends_number)
     res = db_add_friend(user, friends_number)
     if res["success"]:
         session.pop('_flashes', None)
@@ -103,7 +102,6 @@ def add_friend():
     else:
         session.pop('_flashes', None)
         flash(res["message"],'error')  
-    print(res)
     return redirect(url_for("chat"))
 
 @socketio.on('join')
@@ -115,22 +113,33 @@ def handle_join(data):
 @socketio.on('send_message')
 def handle_send_message(data):
     sender = [k for k, v in online_users.items() if v == request.sid]
-    sender_username = sender[0] if sender else "Unknown"
+    sender = sender[0] if sender else "Unknown"
 
+    # sender = session["username"]
     recipient = data['recipient']
     message = data['message']
     timestamp = data['timestamp']
 
-    print(f"[{timestamp}] {sender_username} ➜ {recipient}: {message}")
+    print(f"Sender: {sender} | Receiver: {recipient} | message: {message}")
+    if not sender or not recipient or not message:
+        emit("error", {"message": "Missing fields."}, room=request.sid)
+        return
 
-    if are_friends(sender_username, recipient):
-        store_message(sender_username, recipient, message,timestamp)
+    if are_friends(sender, recipient):
+        if not are_friends(recipient, sender):
+            db_add_friend(recipient, sender)
+
+            if recipient in online_users:
+                recipient_sid = online_users[recipient]
+                socketio.emit("friend_added", {"username": sender}, room=recipient_sid)
+        # Storing Message
+        store_message(sender, recipient, message,timestamp)
     else:
-        emit("error", {"message": "You are not friends with this user."}, room=request.sid)
+        emit("error", {"message": f"Something is Wrong. Your friend list has no such friend {recipient}"}, room=request.sid)
 
     if recipient in online_users:
         emit('receive_message', {
-            'sender': sender_username,
+            'sender': sender,
             'message': message,
             'timestamp': timestamp
         }, room=online_users[recipient])
@@ -145,8 +154,8 @@ def get_messages(friend):
         return redirect(url_for("login"))
 
     current_user = session["username"]
+    print(f'Getting Messages Of {current_user} For {friend}')
     messages = get_chat_history(current_user, friend)
-    print(messages)
     # Filtering Messages
     messages_filtered = [
         {
@@ -174,6 +183,5 @@ def error_handler(e):
 def default_error_handler(e):
     print('Default error handler:', e)
 
-if __name__ == "__main__":
-    # socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet") 
+if __name__ == "__main__": 
     socketio.run(app, host="127.0.0.1", port=5000, debug=True)

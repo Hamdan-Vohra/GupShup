@@ -3,15 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <title>GupShup Chat</title>
-    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
-    <script>
-      const currentUser = "{{ username }}";
-    </script>
-    <script src="{{ url_for('static', filename='js/chat.js') }}" defer></script>
     <link
       href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
       rel="stylesheet"
     />
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+    <!-- chat.js is deferred, so it will execute after the DOM and <script> blocks -->
+    <script src="{{ url_for('static', filename='js/chat.js') }}" defer></script>
   </head>
   <body
     class="bg-gradient-to-br from-indigo-300 to-purple-300 min-h-screen flex flex-col items-center justify-center p-6"
@@ -33,20 +31,19 @@
             +
           </button>
         </div>
-        <!-- This will be replaced by hamza's code -->
         <ul id="friend-list" class="space-y-2 text-black">
-          {% if friends %} {% for phone in friends %}
+          <!-- {% if friends %} {% for phone in friends %}
           <li>
             <button
               onclick="selectFriend('{{ phone.username }}')"
               class="w-full text-left px-3 py-2 bg-white rounded shadow hover:bg-indigo-100"
             >
-              {{ phone['username'] }}
+              {{ phone.username }}
             </button>
           </li>
           {% endfor %} {% else %}
           <li class="text-gray-500 text-sm px-3 py-2">No Friends yet!</li>
-          {% endif %}
+          {% endif %} -->
         </ul>
       </aside>
 
@@ -124,6 +121,12 @@
         </form>
       </div>
     </div>
+
+    <!-- Variables passed from Flask to JS -->
+    <script>
+      const currentUser = "{{ username }}";
+      window.friendListData = {{ friends | tojson | safe }};
+    </script>
 
     <script>
       function toggleAddFriendForm() {

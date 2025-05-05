@@ -69,7 +69,6 @@ def db_add_friend(user1, user2):
     elif  are_friends(user['phone'],friend['phone']):
         return {"success":False,"message":" Already friends"}
     db.users.update_one({"username": user1}, {"$addToSet": {"friends": friend["phone"]}})
-    # db.users.update_one({"phone": user2}, {"$addToSet": {"friends": user["phone"]}})
     return {"success":True,"message":f"{user['username']} has a new friend:  {friend['username']}"}
 
 
@@ -82,17 +81,14 @@ def friends_list(username):
     user = db.users.find_one({'username': username})
     if not user:
         return {"success":False,"friends":None}
-    friend_ids = user.get('friends', [])
-    friends = db.users.find({'phone': {'$in': [phone_number for phone_number in friend_ids]}})
+    friends_number = user.get('friends', [])
+    friends = list(db.users.find({'phone': {'$in': [phone_number for phone_number in friends_number]}},{"_id": 0, "username": 1}))
     return {"success":True,"friends":friends}
 
 def store_message(sender, receiver, content,timestamp):
     db.messages.insert_one({"from": sender, "to": receiver, "content": content,"timestamp":timestamp})
-    if not are_friends(receiver,sender):
-        db_add_friend(receiver,sender)
 
 def get_chat_history(user1, user2):
-    print(user1,user2)
     return list(db.messages.find({
             "$or": [
                 {"from": user1, "to": user2},
