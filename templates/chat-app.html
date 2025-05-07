@@ -14,9 +14,25 @@
   <body
     class="bg-gradient-to-br from-indigo-300 to-purple-300 min-h-screen flex flex-col items-center justify-center p-6"
   >
-    <p class="mb-4 text-lg text-white font-semibold">
-      You are logged in as: <span class="text-yellow-200">{{ username }}</span>
-    </p>
+    <div class="w-full flex justify-between items-center spcae-x-4 mb-4">
+      <h1
+        class="text-4xl font-bold bg-gradient-to-r from-purple-700 via-purple-500 to-purple-200 bg-clip-text text-transparent"
+      >
+        GuPShuP
+      </h1>
+
+      <p class="text-lg text-center text-white font-semibold">
+        You are logged in as:
+        <span class="text-yellow-200">{{ username }}</span>
+      </p>
+
+      <a
+        href="{{ url_for('logout') }} "
+        class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 hover:text-white"
+        >Logout</a
+      >
+    </div>
+
     <div
       class="w-full max-w-8xl h-[80vh] bg-white/20 backdrop-blur rounded-xl shadow-lg flex overflow-hidden"
     >
@@ -31,20 +47,7 @@
             +
           </button>
         </div>
-        <ul id="friend-list" class="space-y-2 text-black">
-          <!-- {% if friends %} {% for phone in friends %}
-          <li>
-            <button
-              onclick="selectFriend('{{ phone.username }}')"
-              class="w-full text-left px-3 py-2 bg-white rounded shadow hover:bg-indigo-100"
-            >
-              {{ phone.username }}
-            </button>
-          </li>
-          {% endfor %} {% else %}
-          <li class="text-gray-500 text-sm px-3 py-2">No Friends yet!</li>
-          {% endif %} -->
-        </ul>
+        <ul id="friend-list" class="space-y-2 text-black"></ul>
       </aside>
 
       <!-- Chat Area -->
@@ -122,9 +125,8 @@
       </div>
     </div>
 
-    <!-- Variables passed from Flask to JS -->
     <script>
-      const currentUser = "{{ username }}";
+      window.currentUser = "{{ username }}";
       window.friendListData = {{ friends | tojson | safe }};
     </script>
 

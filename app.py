@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, flash, session
+from flask_socketio import disconnect
 from config import SECRET_KEY
 from flask import Flask, request, jsonify
 from flask_socketio import SocketIO, emit, join_room
-from datetime import datetime
 from flask_cors import CORS
 
 
@@ -72,21 +72,22 @@ def login():
             flash(res['message'], 'danger')
     return redirect(url_for("login"))
 
-@app.route('/logout')
+@app.route('/logout',methods=['GET'])
 def logout():
     session.clear()
+    print("Hello")
     return redirect(url_for('login'))
 
 
 @app.route('/chat')
 def chat():
-    username = session['username']
     if 'username' not in session:
         return redirect(url_for('login'))
+    username = session['username']
     res = friends_list(username)
     if res["success"]:
         return render_template('chat-app.html', username=username, friends=res["friends"])
-    return redirect(url_for('login'))
+    return render_template('login.html')
 
         
 @app.route("/add_friend", methods=["POST"])
@@ -104,6 +105,18 @@ def add_friend():
         flash(res["message"],'error')  
     return redirect(url_for("chat"))
 
+
+
+# Socket Backend Routes For Real Time Communication
+@socketio.on('join')
+def handle_join(auth):
+    username = auth.get("username")
+    if not username:
+        print("No username provided. Disconnecting.")
+        return disconnect()
+    session['username'] = username
+    print(f"{username} connected via Socket.IO")
+
 @socketio.on('join')
 def handle_join(data):
     username = data.get("username")
@@ -120,7 +133,7 @@ def handle_send_message(data):
     message = data['message']
     timestamp = data['timestamp']
 
-    print(f"Sender: {sender} | Receiver: {recipient} | message: {message}")
+    # print(f"Sender: {sender} | Receiver: {recipient} | message: {message}")
     if not sender or not recipient or not message:
         emit("error", {"message": "Missing fields."}, room=request.sid)
         return
@@ -154,7 +167,7 @@ def get_messages(friend):
         return redirect(url_for("login"))
 
     current_user = session["username"]
-    print(f'Getting Messages Of {current_user} For {friend}')
+    # print(f'Getting Messages Of {current_user} For {friend}')
     messages = get_chat_history(current_user, friend)
     # Filtering Messages
     messages_filtered = [
@@ -168,7 +181,7 @@ def get_messages(friend):
     return jsonify(messages_filtered)
 
 @socketio.on('disconnect')
-def handle_disconnect(*args):
+def disconnect(*args):
     print("Client disconnected")
     for user, sid in list(online_users.items()):
         if sid == request.sid:

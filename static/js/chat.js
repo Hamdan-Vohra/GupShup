@@ -1,4 +1,6 @@
-let socket = io("http://localhost:5000");
+let socket = io("http://localhost:5000", {
+  auth: { username: currentUser },
+});
 
 let selectedFriend = "";
 
@@ -40,6 +42,12 @@ socket.on("error", (data) => {
 // Socket Functionalities Ended
 
 // Simple Javascript functions
+function LogOut() {
+  fetch(`/logout`)
+    .then((response) => response.json())
+    .catch((err) => console.error("Error While Logout:", err));
+}
+
 function selectFriend(friendUsername) {
   selectedFriend = friendUsername;
   document.getElementById("chat-with").textContent = friendUsername;
@@ -57,7 +65,6 @@ function selectFriend(friendUsername) {
 function loadFriendList() {
   const friendList = document.getElementById("friend-list");
   friendList.innerHTML = "";
-  console.log("Friends:", window.friendListData);
 
   if (
     Array.isArray(window.friendListData) &&
