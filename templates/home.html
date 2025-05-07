@@ -1,6 +1,40 @@
 {% extends 'index.html' %} {% block content %}
-<div class="p-8 text-center">
-  <h2 class="text-3xl font-semibold">Welcome to GuPShuP!</h2>
-  <p class="mt-4 text-gray-700">Communicate.</p>
+<div
+  class="p-8 h-[500px] text-center flex flex-col justify-center items-center"
+>
+  <h2 class="text-4xl font-bold text-gray-800 mb-4">Welcome to GuPShuP!</h2>
+  <p class="text-lg text-gray-600 mb-10">Connect securely and chat freely.</p>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+    <div class="bg-white shadow-lg rounded-2xl p-6 transition hover:scale-105">
+      <h3 class="text-xl font-semibold text-indigo-600 mb-2">
+        Secure Communication
+      </h3>
+      <p class="text-gray-700">
+        Your messages are encrypted end-to-end, ensuring your privacy and data
+        protection.
+      </p>
+    </div>
+
+    <div class="bg-white shadow-lg rounded-2xl p-6 transition hover:scale-105">
+      <h3 class="text-xl font-semibold text-pink-600 mb-2">
+        Private Messaging
+      </h3>
+      <p class="text-gray-700">
+        Enjoy one-on-one conversations with friends in a safe and private
+        environment.
+      </p>
+    </div>
+
+    <div class="bg-white shadow-lg rounded-2xl p-6 transition hover:scale-105">
+      <h3 class="text-xl font-semibold text-green-600 mb-2">
+        User-Friendly Interface
+      </h3>
+      <p class="text-gray-700">
+        Clean, modern UI that makes chatting simple, smooth, and accessible for
+        everyone.
+      </p>
+    </div>
+  </div>
 </div>
 {% endblock %}
