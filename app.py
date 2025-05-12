@@ -105,8 +105,6 @@ def add_friend():
         flash(res["message"],'error')  
     return redirect(url_for("chat"))
 
-
-
 # Socket Backend Routes For Real Time Communication
 @socketio.on('join')
 def handle_join(auth):
