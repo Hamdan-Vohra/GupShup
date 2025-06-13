@@ -1,0 +1,50 @@
+<div
+  id="add-friend-form"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50"
+>
+  <div class="bg-white p-6 rounded-lg w-full max-w-md text-black">
+    <h2 class="text-xl font-bold mb-4">Add a Friend</h2>
+    <form method="POST" action="/add_friend">
+      <input
+        type="text"
+        name="friend_phone"
+        placeholder="Enter friend's phone number"
+        required
+        class="w-full p-3 border rounded mb-4 text-black"
+      />
+      <div class="flex justify-end gap-2">
+        <button
+          type="button"
+          onclick="toggleAddFriendForm()"
+          class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+        >
+          Add
+        </button>
+      </div>
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %}
+      <div class="flash-message mt-4 flex justify-center">
+        {% for category, message in messages %}
+        <p
+          class="text-md text-{{ 'green-600' if category == 'success' else 'red-600' }} font-semibold"
+        >
+          {{ message }}
+        </p>
+        {% endfor %}
+      </div>
+      {% endif %} {% endwith %}
+    </form>
+  </div>
+</div>
+
+<script>
+  function toggleAddFriendForm() {
+    document.getElementById("add-friend-form").classList.toggle("hidden");
+  }
+</script>

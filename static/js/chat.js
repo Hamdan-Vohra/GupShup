@@ -2,7 +2,12 @@ let socket = io("http://localhost:5000", {
   auth: { username: currentUser },
 });
 
-let selectedFriend = "";
+let selectedFriend = null;
+const currentUser = window.currentUser || "Guest";
+const friendListContainer = document.getElementById("friend-list");
+const chatWith = document.getElementById("chat-with");
+const chatBox = document.getElementById("chat-box");
+const chatInput = document.getElementById("chat-input");
 
 socket.on("connect", () => {
   console.log("Connected to server. Socket ID:", socket.id);
@@ -42,16 +47,42 @@ socket.on("error", (data) => {
 // Socket Functionalities Ended
 
 // Simple Javascript functions
-function LogOut() {
-  fetch(`/logout`)
-    .then((response) => response.json())
-    .catch((err) => console.error("Error While Logout:", err));
+// Load friend list on DOM ready
+document.addEventListener("DOMContentLoaded", () => {
+  loadFriendList();
+});
+
+// Load friend list function
+function loadFriendList() {
+  friendListContainer.innerHTML = "";
+
+  if (
+    Array.isArray(window.friendListData) &&
+    window.friendListData.length > 0
+  ) {
+    window.friendListData.forEach((friend) => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <button onclick="selectFriend('${friend.username}')"
+          class="w-full text-left px-3 py-2 bg-white rounded shadow hover:bg-indigo-100">
+          ${friend.username}
+        </button>`;
+      friendListContainer.appendChild(li);
+    });
+  } else {
+    const li = document.createElement("li");
+    li.className = "text-gray-500 text-sm px-3 py-2";
+    li.textContent = "No Friends yet!";
+    friendListContainer.appendChild(li);
+  }
 }
 
+// Select friend & load previous conversation
 function selectFriend(friendUsername) {
   selectedFriend = friendUsername;
-  document.getElementById("chat-with").textContent = friendUsername;
-  document.getElementById("chat-box").innerHTML = "";
+  chatWith.textContent = friendUsername;
+  chatBox.innerHTML = "";
+
   fetch(`/get_messages/${friendUsername}`)
     .then((response) => response.json())
     .then((messages) => {
@@ -62,31 +93,8 @@ function selectFriend(friendUsername) {
     .catch((err) => console.error("Error fetching messages:", err));
 }
 
-function loadFriendList() {
-  const friendList = document.getElementById("friend-list");
-  friendList.innerHTML = "";
-
-  if (
-    Array.isArray(window.friendListData) &&
-    window.friendListData.length > 0
-  ) {
-    window.friendListData.forEach((friend) => {
-      const li = document.createElement("li");
-      li.innerHTML = `<button onclick="selectFriend('${friend.username}')" class="w-full text-left px-3 py-2 bg-white rounded shadow hover:bg-indigo-100">${friend.username}</button>`;
-      friendList.appendChild(li);
-    });
-  } else {
-    const li = document.createElement("li");
-    li.className = "text-gray-500 text-sm px-3 py-2";
-    li.textContent = "No Friends yet!";
-    friendList.appendChild(li);
-  }
-}
-
-document.addEventListener("DOMContentLoaded", loadFriendList);
-
+// Append message to chat box
 function appendMessage(sender, message, timestamp = null) {
-  const chatBox = document.getElementById("chat-box");
   const msgDiv = document.createElement("div");
   const time = timestamp ? new Date(timestamp).toLocaleTimeString() : "";
 
@@ -102,19 +110,21 @@ function appendMessage(sender, message, timestamp = null) {
     }">
       <div>${message}</div>
       <div class="text-xs text-gray-500 mt-1">${time}</div>
-    </div>
-  `;
+    </div>`;
 
   chatBox.appendChild(msgDiv);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
+// Send message function
 function sendMessage() {
-  const input = document.getElementById("chat-input");
-  const message = input.value.trim();
+  const message = chatInput.value.trim();
   const timestamp = new Date().toISOString();
 
-  if (!message || !selectedFriend) return;
+  if (!message || !selectedFriend) {
+    alert("Select a friend first & type message.");
+    return;
+  }
 
   socket.emit("send_message", {
     recipient: selectedFriend,
@@ -123,5 +133,12 @@ function sendMessage() {
   });
 
   appendMessage(currentUser, message, timestamp);
-  input.value = "";
+  chatInput.value = "";
+}
+
+// Logout function
+function LogOut() {
+  fetch(`/logout`)
+    .then((response) => response.json())
+    .catch((err) => console.error("Error While Logout:", err));
 }
