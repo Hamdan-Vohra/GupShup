@@ -1,18 +1,48 @@
-<section
-  class="flex-1 flex flex-col bg-white/20 backdrop-blur p-4 rounded-xl m-4 shadow-lg"
->
+<section class="flex-1 flex flex-col bg-gray-900 p-4 shadow-lg">
+  {% if selected_friend %}
   <h2 class="text-xl font-semibold text-black mb-4">
     Chat with:
-    <span id="chat-with" class="font-mono text-indigo-700">WELCOME</span>
+    <span id="chat-with" class="font-mono text-indigo-700"
+      >{{ selected_friend }}</span
+    >
   </h2>
-
+  {% endif %}
   <div
     id="chat-box"
-    class="flex-grow bg-white rounded-lg p-4 overflow-y-auto shadow-inner mb-4"
+    class="flex-grow rounded-lg p-4 overflow-y-auto shadow-inner flex justify-center items-center bg-gray-900 text-white"
   >
-    <p class="text-center text-gray-500">Select a friend to start chatting.</p>
+    {% if messages %}
+    <div class="space-y-4">
+      {% for message in messages %}
+      <div
+        class="p-3 rounded-lg {{ 'bg-blue-100 text-blue-800' if message.sender == username else 'bg-gray-200 text-gray-800' }}"
+      >
+        <strong>{{ message.sender }}:</strong> {{ message.content }}
+        <span class="text-xs text-gray-500 ml-2">{{ message.timestamp }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="flex flex-col justify-center items-center space-y-2">
+      <div class="text-center flex flex-col items-center">
+        <img
+          src="/static/images/logo_vertical.png"
+          alt="No messages"
+          class="h-32 mb-2"
+        />
+        <h5 class="text-center font-semibold">Secure.Private.UserFriendly</h5>
+      </div>
+
+      <div id="no-friends-message" class="text-center text-gray-500">
+        {% if not friend_list %} You have no friends yet. Start by adding some
+        friends! {% elif not selected_friend %} You have no active chat. Select
+        a friend to start chatting! {% endif %}
+      </div>
+    </div>
+    {% endif %}
   </div>
 
+  {% if selected_friend %}
   <div class="flex gap-2">
     <input
       id="chat-input"
@@ -27,4 +57,5 @@
       Send
     </button>
   </div>
+  {% endif %}
 </section>
