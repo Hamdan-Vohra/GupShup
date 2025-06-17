@@ -72,10 +72,12 @@ def login():
             flash(res['message'], 'danger')
     return redirect(url_for("login"))
 
+
 @app.route('/logout',methods=['GET'])
 def logout():
     session.clear()
-    print("Hello")
+    session.pop('_flashes', None)
+    flash("You have been logged out.", 'success')
     return redirect(url_for('login'))
 
 
@@ -86,7 +88,8 @@ def chat():
     username = session['username']
     res = friends_list(username)
     if res["success"]:
-        return render_template('chat-app.html', username=username, friends=res["friends"])
+        selected_friend = res['friends'][0] if res['friends'] else None
+        return render_template('chat-app.html', username=username, friends=res["friends"],selected_friend=selected_friend)
     return render_template('login.html')
 
         

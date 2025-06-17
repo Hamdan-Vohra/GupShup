@@ -29,4 +29,5 @@ def ChatApp():
     if 'username' not in session:
         flash("Login required", "warning")
         return redirect(url_for('login'))
+    print(session['username'])
     return render_template("chat-app.html", username=session['username'])

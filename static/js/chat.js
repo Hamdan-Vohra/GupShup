@@ -47,11 +47,11 @@ socket.on("error", (data) => {
 document.addEventListener("DOMContentLoaded", () => {
   loadFriendList();
 });
-
 function loadFriendList() {
   friendListContainer.innerHTML = "";
 
   const friends = chatStore.getFriends();
+  console.log(friends);
   if (Array.isArray(friends) && friends.length > 0) {
     friends.forEach((friend) => {
       const li = document.createElement("li");
