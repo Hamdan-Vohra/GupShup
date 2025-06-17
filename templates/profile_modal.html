@@ -3,31 +3,27 @@
   class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 h-[20rem] w-[30rem]"
 >
   <div
-    class="bg-white p-6 rounded-lg h-[25rem] w-full max-w-md text-black flex flex-col justify-center items-center gap-3"
+    class="bg-gray-800 p-6 rounded-lg h-[25rem] w-full max-w-md text-black flex flex-col justify-center items-center gap-3"
   >
-    <h2 class="text-xl font-bold mb-2">User Profile</h2>
-    <!-- <form method="POST" action="/update_profile">
-      <input
-        type="text"
-        name="username"
-        placeholder="Enter your username"
-        required
-        class="w-full p-3 border rounded mb-4 text-black"
-      />
-      <input
-        type="email"
-        name="email"
-        placeholder="Enter your email"
-        required
-        class="w-full p-3 border rounded mb-4 text-black"
-      /> -->
+    <div class="w-full border-b-2 border-gray-700 flex justify-center mb-4">
+      <img src="/static/images/logo.png" alt="GuPShuP" class="h-12 mb-2" />
+    </div>
     <div
       class="w-20 h-20 bg-purple-500 rounded-full flex items-center justify-center text-white text-5xl font-bold"
     >
       <span>&#128100;</span>
     </div>
-    <p class="text-lg font-semibold">Name : {{ username }}</p>
-    <p class="text-lg font-semibold">Phone : {{ phone }}</p>
+    <h2 class="text-xl font-bold mb-2">User Profile</h2>
+    <div
+      class="grid grid-cols-4 justify-items-start gap-4 mt-4 w-full text-white"
+    >
+      <h5 class="col-span-1 text-lg font-semibold">Name :</h5>
+      <p class="col-span-3 text-lg font-semibold">{{ username }}</p>
+      <h5 class="col-span-1 text-lg font-semibold">Email :</h5>
+      <p class="col-span-3 text-lg font-semibold">{{ email }}</p>
+      <h5 class="col-span-1 text-lg font-semibold">Phone :</h5>
+      <p class="col-span-3 text-lg font-semibold">{{ phone }}</p>
+    </div>
     <div class="flex justify-end gap-2 mt-4 w-full">
       <a
         href="{{ url_for('logout') }}"
