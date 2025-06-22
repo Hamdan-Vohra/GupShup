@@ -1,26 +1,31 @@
-<section class="flex-1 flex flex-col bg-gray-900 p-4 shadow-lg">
-  {% if selected_friend %}
-  <h2 class="text-xl font-semibold text-black mb-4">
-    Chat with:
-    <span id="chat-with" class="font-mono text-indigo-700"
-      >{{ selected_friend }}</span
+<div class="flex-1 flex flex-col p-2">
+  {% if selectedFriend %}
+  <div
+    class="border-b-2 border-gray-700 p-2 flex justify-center items-center gap-4"
+  >
+    <div
+      class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white text-lg font-bold"
     >
-  </h2>
+      <span>&#128100;</span>
+    </div>
+    <span id="chat-with" class="font-mono text-gray-200 text-lg"
+      >{{ selectedFriend }}</span
+    >
+  </div>
   {% endif %}
   <div
-    id="chat-box"
     class="flex-grow rounded-lg p-4 overflow-y-auto shadow-inner flex justify-center items-center bg-gray-900 text-white"
   >
     {% if messages %}
-    <div class="space-y-4">
-      {% for message in messages %}
+    <div id="chat-box" class="space-y-4">
+      <!-- {% for message in messages %}
       <div
         class="p-3 rounded-lg {{ 'bg-blue-100 text-blue-800' if message.sender == username else 'bg-gray-200 text-gray-800' }}"
       >
         <strong>{{ message.sender }}:</strong> {{ message.content }}
         <span class="text-xs text-gray-500 ml-2">{{ message.timestamp }}</span>
       </div>
-      {% endfor %}
+      {% endfor %} -->
     </div>
     {% else %}
     <div class="flex flex-col justify-center items-center space-y-2">
@@ -44,7 +49,7 @@
     {% endif %}
   </div>
 
-  {% if selected_friend %}
+  {% if selectedFriend %}
   <div class="flex gap-2">
     <input
       id="chat-input"
@@ -60,4 +65,4 @@
     </button>
   </div>
   {% endif %}
-</section>
+</div>
